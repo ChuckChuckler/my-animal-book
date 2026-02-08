@@ -1,2 +1,9 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+    import UserAuthDiv from "$lib/components/UserAuthDiv.svelte";
+</script>
+
+<h1>My Animal Book</h1>
+<UserAuthDiv authType = "Sign Up"></UserAuthDiv>
+<br>
+<br>
+<UserAuthDiv authType = "Log In"></UserAuthDiv>
