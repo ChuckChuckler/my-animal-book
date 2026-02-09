@@ -6,7 +6,7 @@
     async function findAnimals(){
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(async (pos)=>{
-                let geoapifyKey:string = GeoapifyApiKey;
+                let geoapifyKey:string = GEOAPIFY_KEY;
                 let city:string = "";
                 let postcode:string = "";
 
@@ -40,7 +40,6 @@
                     return `https://api.gbif.org/v1/occurrence/search?taxonKey=1&geometry=${gbifGeom}&limit=100000&iucnRedListCategory=CR&iucnRedListCategory=EN&iucnRedListCategory=VU`;
                 })
                 .then(async (gbifUrl)=>{
-                    let iucnRedListCategories = ["CR", "EN", "VU", "NT", "CD", "LC"];
                     let speciesFound:string[] = [];
                     let animals = (await axios.get(gbifUrl)).data.results;
                     for(let i:number = 0; i < animals.length; i++){
@@ -51,6 +50,25 @@
 
                     speciesFound.forEach(i => {
                         console.log(i);
+                    });
+
+                    console.log(speciesFound);
+
+                    return speciesFound;
+                })
+                .then(async (species)=>{
+                    species.forEach(async i=>{
+                        let tempSpeciesArr:string[] = i.split(" ");
+                        let genus = tempSpeciesArr[0];
+                        let speciesName = tempSpeciesArr[1];
+                        axios.post("/api/iucn",{
+                            genus: genus,
+                            species: speciesName
+                        })
+                        .then((response)=>{
+                            let iucnData = response.data;
+                            console.log(iucnData);
+                        })
                     });
                 })
                 .catch((e)=>{
