@@ -6,7 +6,7 @@
     async function findAnimals(){
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(async (pos)=>{
-                let geoapifyKey:string = GEOAPIFY_KEY;
+                let geoapifyKey:string = "GEOAPIFY_KEY";
                 let city:string = "";
                 let postcode:string = "";
 

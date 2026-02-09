@@ -1,7 +1,7 @@
 import type { RequestHandler } from "../$types";
 import { json } from "@sveltejs/kit";
 
-let iucnApiKey:string = IUCN_KEY;
+let iucnApiKey:string = "IUCN_KEY";
 
 export const POST: RequestHandler=async({request})=>{
     let { genus, species } = await request.json();
