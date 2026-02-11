@@ -1,5 +1,7 @@
 <script lang="ts">
     import axios from "axios";
+    import { writable } from "svelte/store";
+    import { onMount } from "svelte";
     import Animal from "$lib/components/Animal.svelte";
 
     let location:string = $state("");
@@ -24,8 +26,19 @@
         "VU":"Vulnerable",
         "NT":"Near Threatened"
     };
+
+    onMount(()=>{
+        const stored=localStorage.getItem("animalDict");
+        if(stored==null){
+            findAnimals();
+        }else{
+            animalDict = JSON.parse(stored);
+            createAnimals();
+        }
+    })
     
     async function findAnimals(){
+        console.log("findAnimals is running!");
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(async (pos)=>{
                 let geoapifyKey:string = GEOAPIFY_KEY;
@@ -63,6 +76,10 @@
                     let speciesList = await getAnimals(gbifUrl);
                     let assessments = await composeAnimalDict(speciesList);
 
+                    const store = writable(animalDict);
+                    store.subscribe(val=>{
+                        localStorage.setItem("animalDict",JSON.stringify(val));
+                    });
                     //getThreatsConservation(assessments);
                 }catch(e){
                     console.log(e);
@@ -160,7 +177,7 @@
 <br>
 <div>
     {#each animalsElements as animalElement}
-        <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status}></Animal>
+        <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status} id={animalElement.commonName.split(" ").join("%20")}></Animal>
         <br>
     {/each}
 </div>
