@@ -13,12 +13,13 @@
         statusCode: string,
         statusId: number,
         threats: unknown,
-        conservation: unknown
+        conservation: unknown,
+        mostRecentAssessment: number
     }
 
-    let animalsElements:Animal[] = $state([]);
-
     let animalDict: Record<string, Animal> = {};
+
+    let animalsElements:Animal[] = $state([]);
 
     const endangeredCodes: Record<string, string> = {
         "CR":"Critically Endangered",
@@ -139,7 +140,8 @@
                             statusCode: iucnAssessmentData.red_list_category_code,
                             statusId: iucnCodes.indexOf(iucnAssessmentData.red_list_category_code),
                             threats: {},
-                            conservation: {}
+                            conservation: {},
+                            mostRecentAssessment: iucnAssessmentData.assessment_id
                         }
                         break;
                     }

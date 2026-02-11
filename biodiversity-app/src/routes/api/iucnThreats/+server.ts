@@ -1,7 +1,7 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "../$types";
 
-let iucnApiKey:string = IUCN_REDLIST_KEY;
+let iucnApiKey:string = IUCN_API_KEY;
 
 export const POST: RequestHandler=async({request})=>{
     let { assessmentId } = await request.json();

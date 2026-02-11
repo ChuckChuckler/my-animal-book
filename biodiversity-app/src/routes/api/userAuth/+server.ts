@@ -5,7 +5,7 @@ import MongoDB, { MongoClient } from "mongodb";
 let uri:string=MONGO_URI;
 let client = new MongoClient(uri);
 let db = client.db(DB_NAME);
-let userColl = db.collection(DB_NAME);
+let userColl = db.collection(COLL_NAME);
 
 export const POST: RequestHandler=async({request})=>{
     const { username, password, type } = await request.json();

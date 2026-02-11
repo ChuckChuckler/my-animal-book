@@ -1,6 +1,7 @@
 <script lang="ts">
     import axios from "axios";
     let { authType } = $props();
+    import { goto } from "$app/navigation";
 
     let user = $state("");
     let pass = $state("");
@@ -22,7 +23,7 @@
             .then((response)=>{
                 errMsg=response.data.msg;
                 if(response.data.success){
-                    console.log("YAYYY!!");
+                    goto("home");
                 }
             })
             .catch((e)=>{
