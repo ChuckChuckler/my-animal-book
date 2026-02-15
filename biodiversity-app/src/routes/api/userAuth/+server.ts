@@ -1,3 +1,4 @@
+import { COLLNAME, DB_NAME, MONGO_URI } from "$env/static/private";
 import type { RequestHandler } from "../$types";
 import { json } from "@sveltejs/kit";
 import MongoDB, { MongoClient } from "mongodb";
@@ -5,7 +6,7 @@ import MongoDB, { MongoClient } from "mongodb";
 let uri:string=MONGO_URI;
 let client = new MongoClient(uri);
 let db = client.db(DB_NAME);
-let userColl = db.collection(COLL_NAME);
+let userColl = db.collection(COLLNAME);
 
 export const POST: RequestHandler=async({request})=>{
     const { username, password, type } = await request.json();

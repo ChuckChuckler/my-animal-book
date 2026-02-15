@@ -1,5 +1,6 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "../$types";
+import { IUCN_API_KEY } from "$env/static/private";
 
 let iucnApiKey:string = IUCN_API_KEY;
 

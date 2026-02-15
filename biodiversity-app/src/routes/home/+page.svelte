@@ -3,6 +3,7 @@
     import { writable } from "svelte/store";
     import { onMount } from "svelte";
     import Animal from "$lib/components/Animal.svelte";
+    import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
 
     let location:string = $state("");
 
@@ -13,8 +14,9 @@
         statusCode: string,
         statusId: number,
         threats: unknown,
-        conservation: unknown,
-        mostRecentAssessment: number
+        conservation: string[],
+        mostRecentAssessment: number,
+        imgSrc: any
     }
 
     let animalDict: Record<string, Animal> = {};
@@ -39,10 +41,9 @@
     })
     
     async function findAnimals(){
-        console.log("findAnimals is running!");
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(async (pos)=>{
-                let geoapifyKey:string = GEOAPIFY_KEY;
+                let geoapifyKey:string = PUBLIC_GEOAPIFY_KEY;
                 let city:string = "";
                 let postcode:string = "";
 
@@ -131,6 +132,8 @@
                 let iucnCodes = ["CR", "EN", "VU", "NT", "CD", "LC"];
                 let commonNames = iucnTaxonData.common_names;
 
+                let imgSrc = await getImage(`${genus} ${speciesName}`);
+
                 for(let i:number = 0; i < commonNames.length; i++){
                     if(commonNames[i].language === "eng"){
                         animalDict[commonNames[i].name] = {
@@ -139,9 +142,10 @@
                             status: endangeredCodes[iucnAssessmentData.red_list_category_code],
                             statusCode: iucnAssessmentData.red_list_category_code,
                             statusId: iucnCodes.indexOf(iucnAssessmentData.red_list_category_code),
-                            threats: {},
-                            conservation: {},
-                            mostRecentAssessment: iucnAssessmentData.assessment_id
+                            threats: [],
+                            conservation: [],
+                            mostRecentAssessment: iucnAssessmentData.assessment_id,
+                            imgSrc: imgSrc
                         }
                         break;
                     }
@@ -156,21 +160,20 @@
         return assessmentIds;
     }
 
+    async function getImage(scientificName:string){
+        try{
+            const response = (await axios.get(`https://api.inaturalist.org/v1/taxa?q=${scientificName.split(" ").join("%20")}`)).data;
+            return response.results[0].default_photo.square_url;
+        }catch(e){
+            return e;
+        }
+    }
+
     function createAnimals(){
         Object.keys(animalDict).forEach(i=>{
             animalsElements.push(animalDict[i]);
         });
     }
-
-    /*async function getThreatsConservation(assessmentIds:unknown[]){
-        console.log(Object.keys(animalDict));
-        for(const i in assessmentIds){
-            const response = ((await axios.post("/api/iucnThreats",{assessmentId:assessmentIds[i]})).data);
-            console.log(Object.keys(animalDict)[i]);
-            console.log(response.msg.threats);
-            console.log(response.msg.conservation_actions);
-        }
-    }*/
 </script>
 
 <h1>Home</h1>
@@ -179,7 +182,7 @@
 <br>
 <div>
     {#each animalsElements as animalElement}
-        <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status} id={animalElement.commonName.split(" ").join("%20")}></Animal>
+        <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status} id={animalElement.commonName.split(" ").join("%20")} imgSrc={animalElement.imgSrc}></Animal>
         <br>
     {/each}
 </div>

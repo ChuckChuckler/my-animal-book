@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import axios from "axios";
     import { goto } from "$app/navigation";
+    import { writable } from "svelte/store";
 
     import AnimalImage from "$lib/components/AnimalImage.svelte";
 
@@ -19,8 +20,8 @@
         status: string,
         statusCode: string,
         statusId: number,
-        threats: unknown,
-        conservation: unknown,
+        threats: Threat[],
+        conservation: string[],
         mostRecentAssessment: number
     }
     let animalDict: Record<string, Animal> = {};
@@ -33,6 +34,7 @@
     }
     let threatsDict: Record<string, Threat> = {};
     let threatsArr:Threat[] = $state([]);
+    let conservationArr:string[] = $state([]);
 
     type Img = {
         imgSrc: string,
@@ -49,22 +51,26 @@
             scientificName = animalInfo.scientificName;
             endangeredStatus = animalInfo.status;
             try{
-                const response = (await axios.post("/api/iucnThreats",{
-                    assessmentId: animalInfo.mostRecentAssessment
-                }));
                 getInfoAbout(animalInfo.commonName);
                 getImages(animalInfo.scientificName);
-                let threats = response.data.msg.threats;
-                console.log(threats);
-                parseThreats(threats);
-                console.log(threatsDict);
+                getConservation(animalInfo.commonName);
+                if(animalDict[animalInfo.commonName].threats.length==0){
+                    const response = (await axios.post("/api/iucnThreats",{
+                        assessmentId: animalInfo.mostRecentAssessment
+                    }));
+                    let threats = response.data.msg.threats;
+                    parseThreats(threats, animalInfo.commonName);
+                }else{
+                    threatsArr = animalDict[animalInfo.commonName].threats;
+                }
+                
             }catch(e){
                 console.log(e);
             }
         }
     });
 
-    function parseThreats(assessedThreats:any[]):void{
+    function parseThreats(assessedThreats:any[], commonName:string):void{
         assessedThreats.forEach(i=>{
             if(i.severity!=undefined && i.score!=undefined){
                 if(!i.severity.toLowerCase().includes("unknown") && !i.description.en.toLowerCase().includes("unknown") && !i.score.toLowerCase().includes("unknown")){
@@ -85,7 +91,12 @@
                     threatsArr.push(threatsDict[i.description.en]);
                 }
             }
-        })
+        });
+        animalDict[commonName].threats = threatsArr;
+        const store = writable(animalDict);
+        store.subscribe(val=>{
+            localStorage.setItem("animalDict",JSON.stringify(val));
+        });
     }
 
     async function getInfoAbout(commonName:string){
@@ -110,10 +121,26 @@
                     imgAlt: scientificName,
                     attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by")
                 })
-                console.log(imgsArr);
             }
         }catch(e){
             console.log(e);
+        }
+    }
+
+    async function getConservation(commonName:string){
+        if(animalDict[commonName].conservation.length==0){
+            const conservationActions = (await axios.post("/api/getConservation",{
+                threats: threatsArr,
+                animal: commonName
+            })).data.msg;
+            conservationArr = conservationActions.split("!SEPARATE!");
+            animalDict[commonName].conservation = conservationArr;
+            const store = writable(animalDict);
+            store.subscribe(val=>{
+                localStorage.setItem("animalDict",JSON.stringify(val));
+            });
+        }else{
+            conservationArr = animalDict[commonName].conservation;
         }
     }
 
@@ -128,18 +155,28 @@
 <h3>{scientificName}</h3>
 <h3>{endangeredStatus}</h3>
 <br>
+
 <div>
     {#each imgsArr as animalImg}
         <AnimalImage imgSrc={animalImg.imgSrc} imgAlt={animalImg.imgAlt} attribution={animalImg.attribution}></AnimalImage>
     {/each}
 </div>
+
 <br>
 <h2>About</h2>
 <p>{animalAbout}</p>
 <br>
+
 <h2>Threats</h2>
 <ul>
     {#each threatsArr as threatElement}
         <li>{`${threatElement.threatName}`}</li>
+    {/each}
+</ul>
+<br>
+<h2>Conservation Actions</h2>
+<ul>
+    {#each conservationArr as conservationAction}
+        <li>{`${conservationAction}`}</li>
     {/each}
 </ul>

@@ -1,3 +1,4 @@
+import { IUCN_API_KEY } from "$env/static/private";
 import type { RequestHandler } from "../$types";
 import { json } from "@sveltejs/kit";
 

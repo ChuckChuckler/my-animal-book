@@ -1,3 +1,4 @@
+import { your_gmail_here } from "$env/static/private";
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 import axios from "axios";
@@ -7,7 +8,7 @@ export const POST:RequestHandler=async({request})=>{
     try{
         const response = (await axios.get(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1&titles=${name.split(" ").join("%20")}`,{
             headers:{
-                "User-Agent":"myAnimalBook (your_gmail_here)"
+                "User-Agent":`myAnimalBook ${your_gmail_here}`
             }
         }));
         
