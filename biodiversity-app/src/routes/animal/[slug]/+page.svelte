@@ -9,6 +9,7 @@
 
     let scientificName = $state("");
     let endangeredStatus = $state("");
+    let animalAbout = $state("");
     
     type Animal = {
         commonName: string,
@@ -67,12 +68,16 @@
     }
 
     async function getInfoAbout(commonName:string){
-        const response = (await axios.get(`https://api.api-ninjas.com/v1/animals?name=${commonName.split(" ").join("%20")}`,{
-            headers:{
-                'X-Api-Key': API_NINJA_KEY
-            }
-        }));
-        console.log(response.data[0].characteristics);
+        const response = (await axios.post("/api/getWikipediaInfo",{
+            name: commonName
+        })).data.msg.query.pages;
+        let wikiArr:string[] = response[Object.keys(response)[0]].extract.split("\n==");
+        animalAbout = wikiArr[0];
+        wikiArr.splice(0,1);
+        let wikiRecord:Record<string, string> = {};
+        wikiArr.forEach(i=>{
+            wikiRecord[i.split("==")[0].trim()]=i.split("==")[1].replaceAll("\n","");
+        });
     }
 
     function rdrctHome(){
@@ -87,6 +92,7 @@
 <h3>{endangeredStatus}</h3>
 <br>
 <h2>About</h2>
+<p>{animalAbout}</p>
 <br>
 <h2>Threats</h2>
 <ul>
