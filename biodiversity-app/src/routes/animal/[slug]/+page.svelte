@@ -165,8 +165,11 @@
 <br>
 <h2>About</h2>
 <p>{animalAbout}</p>
+<p>From Wikipedia</p>
+<a href={`https://en.wikipedia.org/wiki/${data.commonName.split(" ").join("_")}`} title={`Wikipedia article on ${data.commonName}`} target="_blank">Read the rest</a>
 <br>
 
+<br>
 <h2>Threats</h2>
 <ul>
     {#each threatsArr as threatElement}

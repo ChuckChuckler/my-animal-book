@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import Animal from "$lib/components/Animal.svelte";
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
+    import { goto } from "$app/navigation";
 
     let location:string = $state("");
 
@@ -174,11 +175,14 @@
             animalsElements.push(animalDict[i]);
         });
     }
+
+    function rdrctDetect(){
+        goto("animalBook");
+    }
 </script>
 
 <h1>Home</h1>
-<button onclick={findAnimals}>Find Animals</button>
-<p>{location}</p>
+<button onclick={rdrctDetect}>Detect</button>
 <br>
 <div>
     {#each animalsElements as animalElement}
