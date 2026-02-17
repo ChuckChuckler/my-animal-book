@@ -6,6 +6,7 @@
 
     let entryDisplay:any;
     let entryEdit:any;
+    let deletionConfirmation:any;
 
     let { data }:PageProps = $props();
 
@@ -62,6 +63,29 @@
             goto(commonName);
         }
     }
+
+    function promptDelConfirmation(){
+        deletionConfirmation.style.display = "block";
+        entryDisplay.style.display = "none";
+    }
+
+    function cancelDel(){
+        deletionConfirmation.style.display = "none";
+        entryDisplay.style.display  = "block";
+    }
+
+    async function deleteEntry(){
+        let username = document.cookie.split("=")[1];
+        const response = (await axios.post("/api/deleteEntry", {
+            username: username,
+            animalName: commonName
+        })).data.msg;
+        if(response=="success"){
+            goto("../animalBook");
+        }else{
+            alert(response);
+        }
+    }
 </script>
 
 <button onclick={returnJournal}>Return to journal</button>
@@ -75,6 +99,8 @@
     <p>{entryInfo}</p>
     <br>
     <button onclick={openEditMenu}>Edit</button>
+    <br>
+    <button onclick={promptDelConfirmation}>Delete Entry</button>
 </div>
 
 <div bind:this={entryEdit} class="hidden">
@@ -89,4 +115,10 @@
     <button onclick={saveEdits}>Save Edits</button>
     <br>
     <p>{errMsg}</p>
+</div>
+
+<div bind:this={deletionConfirmation} class="hidden">
+    <h1>Are you sure you want to delete this entry? This cannot be undone!</h1>
+    <button onclick={deleteEntry}>Yes</button>
+    <button onclick={cancelDel}>No</button>
 </div>
