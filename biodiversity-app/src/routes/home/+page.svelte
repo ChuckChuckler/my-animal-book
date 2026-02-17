@@ -177,7 +177,7 @@
     }
 
     function rdrctDetect(){
-        goto("animalBook");
+        goto("addEntry");
     }
 </script>
 

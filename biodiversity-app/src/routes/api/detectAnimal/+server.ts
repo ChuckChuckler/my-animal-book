@@ -4,10 +4,11 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { ANIMALDETECT_KEY } from "$env/static/private";
 
 export const POST:RequestHandler=async({request})=>{
-    let { b64 } = await request.json();
+    let { b64, cCode } = await request.json();
     const response = (await axios.post("https://www.animaldetect.com/api/v1/detect",
         {
-            image: b64
+            image: b64,
+            country: cCode
         },
         {
             headers:{
