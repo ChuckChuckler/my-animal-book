@@ -37,8 +37,8 @@
                     }else{
                         reject("its null :(");
                     }
-                    reader.readAsDataURL(imgInput.files[0]);
                 }
+                reader.readAsDataURL(imgInput.files[0]);
             }else{
                 errMsg="Please upload an image";
                 reject("no image uploaded!");
@@ -47,34 +47,30 @@
     }
 
     async function send(){
-        createB64(true)
-        .then((b64)=>{
-            console.log(b64);
+        createB64(false)
+        .then(async b64=>{
+            try{
+                let countryCode = await getCountryCode();
+                const response = (await axios.post("/api/detectAnimal", {
+                    b64:b64,
+                    cCode:countryCode,
+                })).data.msg.annotations[0];
+                journalEntryFields = journalEntryFields.replace("hidden", "block");
+                commonName=response.label;
+                scientificName=`${response.taxonomy.genus} ${response.taxonomy.species}`;
+            }catch(e){
+                errMsg=e;
+            }
         })
-        .catch((e)=>{
+        .catch(e=>{
             console.log(e);
         });
-        //console.log(b64);
-        /*try{
-            let countryCode = await getCountryCode();
-            const response = (await axios.post("/api/detectAnimal", {
-                b64:b64,
-                cCode:countryCode,
-            })).data.msg.annotations[0];
-            journalEntryFields = journalEntryFields.replace("hidden", "block");
-            commonName=response.label;
-            scientificName=`${response.taxonomy.genus} ${response.taxonomy.species}`;
-        }catch(e){
-            errMsg=e;
-        }*/
     }
 
     async function getCountryCode(){
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(async (pos)=>{
                 let geoapifyKey:string = PUBLIC_GEOAPIFY_KEY;
-                let city:string = "";
-                let postcode:string = "";
 
                 let lat:number = pos.coords.latitude;
                 let lon:number = pos.coords.longitude;
@@ -90,7 +86,21 @@
         if(foundWhere==""){
             errMsg="Please add a location!";
         }else{
-            
+            createB64(true)
+            .then(async b64=>{
+                const response = (await axios.post("/api/addEntry",{
+                    commonName: commonName,
+                    scientificName: scientificName,
+                    animalImage: b64,
+                    found: foundWhere,
+                    notes: notes,
+                    username:document.cookie.split("=")[1]
+                })).data;
+                console.log(response.msg);
+            })
+            .catch(e=>{
+                console.log(e);
+            })
         }
     }
 </script>

@@ -23,6 +23,7 @@
             .then((response)=>{
                 errMsg=response.data.msg;
                 if(response.data.success){
+                    document.cookie = `username=${user}`;
                     goto("home");
                 }
             })

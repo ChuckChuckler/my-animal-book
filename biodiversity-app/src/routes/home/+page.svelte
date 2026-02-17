@@ -7,6 +7,7 @@
     import { goto } from "$app/navigation";
 
     let location:string = $state("");
+    let username:string=$state("");
 
     type Animal = {
         commonName: string,
@@ -32,12 +33,17 @@
     };
 
     onMount(()=>{
-        const stored=localStorage.getItem("animalDict");
-        if(stored==null){
-            findAnimals();
+        if(document.cookie.length==0){
+            goto("");
         }else{
-            animalDict = JSON.parse(stored);
-            createAnimals();
+            username=document.cookie.split("=")[1];
+            const stored=localStorage.getItem("animalDict");
+            if(stored==null){
+                findAnimals();
+            }else{
+                animalDict = JSON.parse(stored);
+                createAnimals();
+            }
         }
     })
     
@@ -181,7 +187,7 @@
     }
 </script>
 
-<h1>Home</h1>
+<h1>Welcome, {username}!</h1>
 <button onclick={rdrctDetect}>Detect</button>
 <br>
 <div>
