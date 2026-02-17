@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
     import axios from "axios";
 
@@ -103,7 +104,15 @@
             })
         }
     }
+
+    function rdrctJournal(){
+        goto("animalBook");
+    }
+    
 </script>
+
+<button onclick={rdrctJournal}>Return to journal</button>
+<br>
 
 <h1>Add Entry</h1>
 <input type="file" accept="image/*" bind:this={imgInput} onchange={detect}>
