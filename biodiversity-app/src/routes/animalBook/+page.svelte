@@ -3,11 +3,26 @@
     import { onMount } from "svelte";
     import axios from "axios";
 
+    import JournalEntryElement from "$lib/components/JournalEntry.svelte";
+
+    type JournalEntry = {
+        commonName:string,
+        scientificName:string,
+        animalImage:string,
+        found:string,
+        notes:string,
+        dateOf:string
+    };
+
+    let journalEntries:JournalEntry[] = $state([]);
+
+
     onMount(async ()=>{
         let username = document.cookie.split("=")[1];
         const journal = (await axios.post("/api/getJournal", {
             username:username
         })).data.msg.journal;
+        journalEntries = journal;
     })
 
     function addEntry(){
@@ -23,8 +38,10 @@
 <br>
 
 <h1>Animal Book</h1>
-<div>
-
+<div class="grid auto-cols-3">
+    {#each journalEntries as entry}
+        <JournalEntryElement animalName={entry.commonName} animalImage={entry.animalImage} dateOfEntry={entry.dateOf}></JournalEntryElement>
+    {/each}
 </div>
 <br>
 <button onclick={addEntry}>Add Entry</button>
