@@ -89,15 +89,17 @@
         }else{
             createB64(true)
             .then(async b64=>{
-                const response = (await axios.post("/api/addEntry",{
+                await axios.post("/api/addEntry",{
                     commonName: commonName,
                     scientificName: scientificName,
                     animalImage: b64,
                     found: foundWhere,
                     notes: notes,
                     username:document.cookie.split("=")[1]
-                })).data;
-                console.log(response.msg);
+                })
+                .then(()=>{
+                    goto("animalbook");
+                });
             })
             .catch(e=>{
                 console.log(e);

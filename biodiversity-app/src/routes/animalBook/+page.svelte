@@ -38,7 +38,7 @@
 <br>
 
 <h1>Animal Book</h1>
-<div class="grid auto-cols-3">
+<div class="w-[80%] grid grid-cols-3 bg-red-200">
     {#each journalEntries as entry}
         <JournalEntryElement animalName={entry.commonName} animalImage={entry.animalImage} dateOfEntry={entry.dateOf}></JournalEntryElement>
     {/each}

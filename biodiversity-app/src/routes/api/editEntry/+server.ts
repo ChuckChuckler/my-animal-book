@@ -24,7 +24,7 @@ type Document = {
 }
 
 export const POST:RequestHandler=async({request})=>{
-    let { commonName, scientificName, animalImage, found, notes, username } = await request.json();
+    let { previousCommonName, commonName, scientificName, animalImage, found, notes, dateGiven, username } = await request.json();
     try{
         let journalEntry:JournalEntry = {
             commonName:commonName,
@@ -32,14 +32,17 @@ export const POST:RequestHandler=async({request})=>{
             animalImage:animalImage,
             found:found,
             notes:notes,
-            dateOf: new Date().toDateString()
+            dateOf: dateGiven
         }
-        await userColl.updateOne({username:username},{
-            $push:{
-                journal:journalEntry
+        
+        let ahh = await userColl.updateOne({username:username, "journal.commonName":previousCommonName},
+            {$set:{
+                    "journal.$":journalEntry
+                } 
             }
-        });
-        return json({msg:journalEntry});
+        );
+        console.log(ahh);
+        return json({msg:"success"});
     }catch(e){
         return json({msg:e})
     }
