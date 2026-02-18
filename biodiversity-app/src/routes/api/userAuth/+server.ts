@@ -2,6 +2,7 @@ import { COLLNAME, DB_NAME, MONGO_URI } from "$env/static/private";
 import type { RequestHandler } from "../$types";
 import { json } from "@sveltejs/kit";
 import MongoDB, { MongoClient } from "mongodb";
+import bcrypt, { hash } from "bcryptjs";
 
 let uri:string=MONGO_URI;
 let client = new MongoClient(uri);
@@ -20,9 +21,10 @@ export const POST: RequestHandler=async({request})=>{
                 success: false
             });
         }else{
+            let hashPass = bcrypt.hashSync(password, 10);
             userColl.insertOne({
                 username: username,
-                password: password,
+                password: hashPass,
                 journal: []
             });
             return json({
@@ -37,15 +39,16 @@ export const POST: RequestHandler=async({request})=>{
                 success: false
             });
         }else{
-            if(await userColl.findOne({username: username, password: password})==null){
-                return json({
-                    msg: "Incorrect password!",
-                    success: false
-                });
-            }else{
+            let hashPass = found.password;
+            if(bcrypt.compareSync(password, hashPass)){
                 return json({
                     msg: "Successfully logged in! Redirecting...",
                     success: true,
+                });
+            }else{
+                return json({
+                    msg: "Incorrect password",
+                    success: false
                 });
             }
         }
