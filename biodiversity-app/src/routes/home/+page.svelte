@@ -89,7 +89,6 @@
                     store.subscribe(val=>{
                         localStorage.setItem("animalDict",JSON.stringify(val));
                     });
-                    //getThreatsConservation(assessments);
                 }catch(e){
                     console.log(e);
                 }

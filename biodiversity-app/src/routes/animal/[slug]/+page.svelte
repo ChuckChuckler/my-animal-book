@@ -59,6 +59,7 @@
                         assessmentId: animalInfo.mostRecentAssessment
                     }));
                     let threats = response.data.msg.threats;
+                    console.log(threats);
                     parseThreats(threats, animalInfo.commonName);
                 }else{
                     threatsArr = animalDict[animalInfo.commonName].threats;
