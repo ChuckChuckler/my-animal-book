@@ -10,8 +10,8 @@
 
     let commonNameUnedited = $state("");
 
-    let commonName = $state("?");
-    let scientificName = $state("?");
+    let commonName = $state("");
+    let scientificName = $state("");
     let foundWhere = $state("");
     let notes = $state("");
 
@@ -76,11 +76,15 @@
                     cCode:countryCode,
                 })).data.msg.annotations[0];
                 journalEntryFields = journalEntryFields.replace("hidden", "block");
-                commonName=response.label;
-                commonNameUnedited=response.label;
-                scientificName=`${response.taxonomy.genus} ${response.taxonomy.species}`;
-                learnAboutDiv=`visible`;
-                await getInfo();
+                if(response!=undefined){
+                    commonName=response.label;
+                    commonNameUnedited=response.label;
+                    scientificName=`${response.taxonomy.genus} ${response.taxonomy.species}`;
+                    if(commonName!="" && scientificName!=""){
+                        learnAboutDiv=`visible`;
+                        await getInfo();
+                    }
+                }
             }catch(e){
                 errMsg=e;
             }

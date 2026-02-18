@@ -5,9 +5,12 @@
     import Animal from "$lib/components/Animal.svelte";
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
     import { goto } from "$app/navigation";
+    
+    let pfpButton:any;
 
-    let location:string = $state("");
+    let location:string=$state("");
     let username:string=$state("");
+    let userPfp:string=$state("");
 
     type Animal = {
         commonName: string,
@@ -32,7 +35,7 @@
         "NT":"Near Threatened"
     };
 
-    onMount(()=>{
+    onMount(async ()=>{
         if(document.cookie.length==0){
             goto("");
         }else{
@@ -44,6 +47,11 @@
                 animalDict = JSON.parse(stored);
                 createAnimals();
             }
+            const pfp = (await axios.post("/api/getUserPfp", {username:username})).data.msg;
+            userPfp = pfp;
+            pfpButton.addEventListener("click", ()=>{
+                goto(`userProfile/${username}`);
+            })
         }
     })
     
@@ -185,7 +193,7 @@
         goto("animalBook");
     }
 </script>
-
+<img src={userPfp} alt="user profile" class="w-[100px] rounded-full" bind:this={pfpButton}>
 <h1>Welcome, {username}!</h1>
 <button onclick={rdrctDetect}>Detect</button>
 <br>

@@ -2,6 +2,6 @@ import type { PageLoad } from "./$types";
 
 export const load:PageLoad = ({ params })=>{
     return{
-        animalName:params.slug
+        username:params.slug
     }
 }

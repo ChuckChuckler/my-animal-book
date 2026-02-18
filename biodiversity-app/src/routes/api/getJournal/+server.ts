@@ -20,7 +20,9 @@ type Document = {
     _id:ObjectId,
     username:string,
     password:string,
-    journal:JournalEntry[]
+    profilePicture:string,
+    journal:JournalEntry[],
+    blogPosts:any[]
 }
 
 export const POST:RequestHandler=async({request})=>{
