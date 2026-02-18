@@ -193,7 +193,7 @@
         goto("animalBook");
     }
 </script>
-<img src={userPfp} alt="user profile" class="w-[100px] rounded-full" bind:this={pfpButton}>
+<img src={userPfp} alt="user profile" class="w-[100px] rounded-full aspect-square object-cover" bind:this={pfpButton}>
 <h1>Welcome, {username}!</h1>
 <button onclick={rdrctDetect}>Detect</button>
 <br>
