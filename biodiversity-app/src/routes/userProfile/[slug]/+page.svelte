@@ -4,6 +4,8 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
 
+    import AnimalBook from "$lib/components/AnimalBook.svelte";
+
     let { data }:PageProps = $props();
 
     let newImageInput:any;
@@ -135,21 +137,26 @@
 
 <button onclick={home}>Back to home</button>
 
-<div class={`${userDisplay}`}>
-    <div class="flex">
-        <img src={userPfp} alt="user profile" class="w-[200px] rounded-full object-cover aspect-square">
-        <h1>{data.username}</h1>
+<div class={`${userDisplay} flex w-[97%] justify-between`}>
+    <div>
+        <div class="flex">
+            <img src={userPfp} alt="user profile" class="w-[200px] rounded-full object-cover aspect-square">
+            <h1>{data.username}</h1>
+        </div>
+        <div class="flex w-[20%] justify-between">
+            <p class={`${statusDisplay}`}>{userStatus}</p>
+            <input type="text" bind:value={newStatus} class={`${statusEditor}`}>
+            <button class={`${statusEditorBtn}`} onclick={editStatus}>Edit status</button>
+            <button class={`${statusEditor}`} onclick={saveStatus}>Save</button>
+        </div>
+        <br>
+        <p>{userBio}</p>
+        <br>
+        <button class={`${editVisibility}`} onclick={showEditInterface}>Edit</button>
     </div>
-    <div class="flex w-[20%] justify-between">
-        <p class={`${statusDisplay}`}>{userStatus}</p>
-        <input type="text" bind:value={newStatus} class={`${statusEditor}`}>
-        <button class={`${statusEditorBtn}`} onclick={editStatus}>Edit status</button>
-        <button class={`${statusEditor}`} onclick={saveStatus}>Save</button>
+    <div>
+        <AnimalBook bookOwner={`${data.username}`} ownerIsUser={false} width="60" clickable={false}></AnimalBook>
     </div>
-    <br>
-    <p>{userBio}</p>
-    <br>
-    <button class={`${editVisibility}`} onclick={showEditInterface}>Edit</button>
 </div>
 
 <div class={`${editingInterface}`}>

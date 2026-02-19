@@ -124,7 +124,7 @@
                     username:document.cookie.split("=")[1]
                 })
                 .then(()=>{
-                    goto("animalbook");
+                    goto("animalBook");
                 });
             })
             .catch(e=>{
