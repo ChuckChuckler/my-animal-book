@@ -14,11 +14,15 @@
     let userPfp:string=$state("");
     let userStatus:string=$state("");
     let userBio:string=$state("");
+    let statusDisplay:string=$state("");
 
     let editVisibility:string=$state("hidden");
+    let statusEditor:string=$state("hidden");
+    let statusEditorBtn:string=$state("hidden");
 
     let newBio:string=$state("");
     let newUserPfp:string=$state("");
+    let newStatus:string=$state("");
 
     onMount(async ()=>{
         let currentClient = document.cookie.split("=")[1];
@@ -28,6 +32,7 @@
             userPfp=fetchedInfo.profilePicture,
             newUserPfp=fetchedInfo.profilePicture,
             userStatus=fetchedInfo.status,
+            newStatus=fetchedInfo.status,
             userBio=fetchedInfo.bio,
             newBio=fetchedInfo.bio
         }else{
@@ -36,6 +41,7 @@
         
         if(data.username===currentClient){
             editVisibility="block";
+            statusEditorBtn="block";
         }
     });
 
@@ -83,13 +89,12 @@
             await axios.post("/api/editUserInfo", {
                 username:data.username,
                 pfp: newUserPfp,
-                bio: newBio
+                bio: newBio,
+                status: "not changed"
             })
             .then(()=>{
                 location.reload();
             });
-        }else{
-            console.log("wowowowowoah");
         }
     }
 
@@ -103,6 +108,29 @@
             }
         })
     }
+
+    function editStatus(){
+        statusEditor="block";
+        statusEditorBtn="hidden";
+        statusDisplay="hidden";
+    }
+    
+    async function saveStatus(){
+        if(newStatus!=userStatus){
+            await axios.post("/api/editUserInfo", {
+                username:data.username,
+                pfp: "not changed",
+                bio: "not changed",
+                status: newStatus
+            })
+            .then(()=>{
+                userStatus=newStatus;
+                statusEditor="hidden";
+                statusDisplay="block";
+                statusEditorBtn="block";
+            });
+        }
+    }
 </script>
 
 <button onclick={home}>Back to home</button>
@@ -112,9 +140,11 @@
         <img src={userPfp} alt="user profile" class="w-[200px] rounded-full object-cover aspect-square">
         <h1>{data.username}</h1>
     </div>
-    <div class="flex">
-        <p>{userStatus}</p>
-        <button>Edit status</button>
+    <div class="flex w-[20%] justify-between">
+        <p class={`${statusDisplay}`}>{userStatus}</p>
+        <input type="text" bind:value={newStatus} class={`${statusEditor}`}>
+        <button class={`${statusEditorBtn}`} onclick={editStatus}>Edit status</button>
+        <button class={`${statusEditor}`} onclick={saveStatus}>Save</button>
     </div>
     <br>
     <p>{userBio}</p>

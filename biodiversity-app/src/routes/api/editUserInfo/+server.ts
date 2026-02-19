@@ -19,20 +19,37 @@ type Document = {
 }
 
 export const POST:RequestHandler=async ({request})=>{
-    let {username, pfp, bio} = await request.json();
-    try{
-        if(username!=null){
-            await userInfo.updateOne({username:username},{
-                $set:{
-                    profilePicture: pfp,
-                    bio: bio
-                }
-            });
-            return json({msg:"success"});
-        }else{
-            return json({msg:"error"});
+    let {username, pfp, bio, status } = await request.json();
+    if(status=="not changed"){
+        try{
+            if(username!=null){
+                await userInfo.updateOne({username:username},{
+                    $set:{
+                        profilePicture: pfp,
+                        bio: bio
+                    }
+                });
+                return json({msg:"success"});
+            }else{
+                return json({msg:"error"});
+            }
+        }catch(e){
+            return json({msg:e});
         }
-    }catch(e){
-        return json({msg:e});
+    }else{
+        try{
+            if(username!=null){
+                await userInfo.updateOne({username:username},{
+                    $set:{
+                        status:status
+                    }
+                });
+                return json({msg:"success"});
+            }else{
+                return json({msg:"error"});
+            }
+        }catch(e){
+            return json({msg:e});
+        }
     }
 }
