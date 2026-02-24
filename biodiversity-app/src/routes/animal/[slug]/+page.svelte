@@ -39,9 +39,16 @@
     type Img = {
         imgSrc: string,
         imgAlt: string,
-        attribution: string
+        attribution: string,
+        display: string
     }
     let imgsArr:Img[] = $state([]);
+
+    async function sleep(ms:number):Promise<void> {
+        return new Promise(
+            (resolve)=>setTimeout(resolve, ms)
+        );
+    }
 
     onMount(async ()=>{
         const stored=localStorage.getItem("animalDict");
@@ -115,15 +122,64 @@
     async function getImages(scientificName:string){
         try{
             const response = (await axios.get(`https://api.inaturalist.org/v1/taxa?q=${scientificName.split(" ").join("%20")}`)).data;
-            for(let i:number = 0; i < 5; i++){
-                imgsArr.push({
-                    imgSrc: response.results[i].default_photo.medium_url,
-                    imgAlt: scientificName,
-                    attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by")
-                })
+            if(response.results.length<5){
+                for(let i:number = 0; i < response.results.length; i++){
+                    let display = "";
+                    if(i==0){
+                        display = "block";
+                    }else{
+                        display = "hidden";
+                    }
+                    imgsArr.push({
+                        imgSrc: response.results[i].default_photo.medium_url,
+                        imgAlt: scientificName,
+                        attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by"),
+                        display: display
+                    })
+                }
+            }else{
+                for(let i:number = 0; i < 5; i++){
+                    let display = "hidden";
+                    if(i==0){
+                        display = "block";
+                    }
+                    imgsArr.push({
+                        imgSrc: response.results[i].default_photo.medium_url,
+                        imgAlt: scientificName,
+                        attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by"),
+                        display: display
+                    })
+                }
             }
+            cycleImages(response.results.length);
         }catch(e){
             console.log(e);
+        }
+    }
+
+    let index:number=0;
+
+    async function cycleImages(numImages:number){
+        while(true){
+            await sleep(3000);
+
+            /*console.log(document.getElementById(`animalImage${index}`));
+
+            let obj:any = document.getElementById(`animalImage${index}`);
+            if(obj!=null){
+                obj.display = "none";
+            }
+
+            if(index==numImages){
+                index=0;
+            }else{
+                index+=1;
+            }
+
+            obj = document.getElementById(`animalImage${index}`);
+            if(obj!=null){
+                obj.display = "block";
+            }*/
         }
     }
 
@@ -149,37 +205,55 @@
     }
 </script>
 
-<button onclick={rdrctHome}>Home</button>
-<br>
-<h1>{data.commonName}</h1>
-<h3>{scientificName}</h3>
-<h3>{endangeredStatus}</h3>
-<br>
+<div class="bg-[#E1FFC4] box-border p-[20px]">
+    <button onclick={rdrctHome} class="koho text-[24px] bg-[#FFDBE6] w-[160px] h-[40px] rounded-[18px] hover:bg-[#FFC8D7]">Home</button>
+    <h1 class="koulen text-center text-[45px] leading-[30px]">{data.commonName}</h1>
+    <h3 class="kaisei-tokumin text-[24px] text-center">({scientificName})</h3>
+    <br>
+    <div class="flex justify-around">
+        <div>
+            {#each imgsArr as animalImg}
+                <AnimalImage imgSrc={animalImg.imgSrc} imgAlt={animalImg.imgAlt} attribution={animalImg.attribution} display={animalImg.display} id={`animalImage${imgsArr.indexOf(animalImg)}`}></AnimalImage>
+            {/each}
+        </div>
+        <div class="w-[48vw] h-[65vh] overflow-auto scrollbar">
+            <p class="koho text-[18px]">{animalAbout}</p>
+            <a href={`https://en.wikipedia.org/wiki/${data.commonName.split(" ").join("_")}`} title={`Wikipedia article on ${data.commonName}`} target="_blank" class="underline text-[#ff14a9]">Read more on Wikipedia</a>
+        </div>
+    </div>
 
-<div>
-    {#each imgsArr as animalImg}
-        <AnimalImage imgSrc={animalImg.imgSrc} imgAlt={animalImg.imgAlt} attribution={animalImg.attribution}></AnimalImage>
-    {/each}
+    <br>
+    <h3>{endangeredStatus}</h3>
+    <h2>Threats</h2>
+    <ul>
+        {#each threatsArr as threatElement}
+            <li>{`${threatElement.threatName}`}</li>
+        {/each}
+    </ul>
+    <br>
+    <h2>Conservation Actions</h2>
+    <ul>
+        {#each conservationArr as conservationAction}
+            <li>{`${conservationAction}`}</li>
+        {/each}
+    </ul>
 </div>
 
-<br>
-<h2>About</h2>
-<p>{animalAbout}</p>
-<p>From Wikipedia</p>
-<a href={`https://en.wikipedia.org/wiki/${data.commonName.split(" ").join("_")}`} title={`Wikipedia article on ${data.commonName}`} target="_blank">Read the rest</a>
-<br>
+<style>
+    .koulen{
+        font-family: "Koulen", sans-serif;
+    }
 
-<br>
-<h2>Threats</h2>
-<ul>
-    {#each threatsArr as threatElement}
-        <li>{`${threatElement.threatName}`}</li>
-    {/each}
-</ul>
-<br>
-<h2>Conservation Actions</h2>
-<ul>
-    {#each conservationArr as conservationAction}
-        <li>{`${conservationAction}`}</li>
-    {/each}
-</ul>
+    .kaisei-tokumin{
+        font-family: "Kaisei Tokumin", serif;
+    }
+
+    .koho{
+        font-family: "KoHo", sans-serif;
+    }
+
+    .scrollbar{
+        scrollbar-width: thin;
+        scrollbar-color: #FFDBE6 white;
+    }
+</style>
