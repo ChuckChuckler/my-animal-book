@@ -193,13 +193,96 @@
         goto("animalBook");
     }
 </script>
-<img src={userPfp} alt="user profile" class="w-[100px] rounded-full aspect-square object-cover" bind:this={pfpButton}>
-<h1>Welcome, {username}!</h1>
-<button onclick={rdrctDetect}>Detect</button>
-<br>
-<div>
-    {#each animalsElements as animalElement}
-        <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status} id={animalElement.commonName.split(" ").join("%20")} imgSrc={animalElement.imgSrc}></Animal>
-        <br>
-    {/each}
+<div class="bg-linear-to-b from-[#E1FFC4] to-[#CAFF82] h-[100vh] overflow-hidden">
+    <div class="flex w-[95vw] h-[23vh] m-auto justify-around">
+        <div class="w-[40%] m-auto">
+            <div class="flex justify-around w-[100%]">
+                <img src={userPfp} alt="user profile" class="pfp rounded-full aspect-square object-cover" bind:this={pfpButton}>
+                <div class="m-auto">
+                    <h1 class="text-[34px] koulen">Welcome, {username}!</h1>
+                    <h2 class="text-[20px] kaisei-tokumin">What animals can we find today?</h2>
+                </div>
+            </div>
+        </div>
+        <button onclick={rdrctDetect} class="nav-btns bg-[#FFDBE6] hover:bg-[#FFC8D7] rounded-[23px] m-auto koho text-[25px]">Animal Book</button>
+        <button class="nav-btns bg-[#FFDBE6] hover:bg-[#FFC8D7] rounded-[23px] m-auto koho text-[25px]">Blog</button>
+    </div>
+    <br>
+    <div class="w-[95%] h-[74vh] flex justify-around m-auto">
+        <div class="bg-[#FFFAED] h-[95%] w-[69%] rounded-[28px] box-border p-[25px] overflow-auto scrollbar">
+            <h1 class="text-center text-[20px] kaisei-tokumin">Endangered Animals In Your Area</h1>
+            <br>
+            <div class="grid grid-cols-2 gap-5">
+                {#each animalsElements as animalElement}
+                    <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status} id={animalElement.commonName.split(" ").join("%20")} imgSrc={animalElement.imgSrc}></Animal>
+                {/each}
+            </div>
+        </div>
+        <div class="bg-[#FFF7E4] w-[25%] h-[95%] rounded-[28px]">
+
+        </div>
+    </div>
 </div>
+
+<style>
+    .koulen{
+        font-family: "Koulen", sans-serif;
+    }
+
+    .kaisei-tokumin{
+        font-family: "Kaisei Tokumin", serif;
+    }
+
+    .koho{
+        font-family: "KoHo", sans-serif;
+    }
+
+    @keyframes pfp-1{
+        from{width: 120px; height: 120px;}
+        to{width: 125px; height: 125px;}
+    }
+
+    @keyframes pfp-2{
+        to{width: 120px; height: 120px;}
+        from{width: 125px; height: 125px;}
+    }
+
+    .pfp{
+        width: 120px;
+        height: 120px;
+        animation: pfp-2 0.5s ease-out;
+    }
+
+    .pfp:hover{
+        width: 125px;
+        height: 125px;
+        animation: pfp-1 0.5s ease-out;
+    }
+
+    @keyframes nav-btns-1{
+        to{width:26%;height:100px}
+        from{width:25%;height:98px}
+    }
+
+    @keyframes nav-btns-2{
+        from{width:26%;height:100px}
+        to{width:25%;height:98px}
+    }
+
+    .nav-btns{
+        width: 25%;
+        height: 98px;
+        animation: nav-btns-2 0.5s ease-out;
+    }
+
+    .nav-btns:hover{
+        width: 26%;
+        height: 98px;
+        animation: nav-btns-1 0.5s ease-out;
+    }
+
+    .scrollbar{
+        scrollbar-width: thin;
+        scrollbar-color: #FFDBE6 white;
+    }
+</style>
