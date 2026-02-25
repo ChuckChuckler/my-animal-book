@@ -6,6 +6,7 @@
     import { goto } from "$app/navigation";
     import { writable } from "svelte/store";
     import gsap from "gsap";
+    import { ScrollTrigger,  ScrollToPlugin} from "gsap/all";
 
     import AnimalImage from "$lib/components/AnimalImage.svelte";
 
@@ -67,6 +68,8 @@
     }
 
     onMount(async ()=>{
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
         const stored=localStorage.getItem("animalDict");
         if(stored!=null){
             animalDict = JSON.parse(stored);
@@ -91,12 +94,52 @@
                 console.log(e);
             }
         }
+        //gsap
+        let animRunning = false;
+
+        ScrollTrigger.create({
+            trigger: "#threatInfo",
+            start: "top bottom",
+            end: "bottom top",
+            onEnter:()=>{
+                if(!animRunning){
+                    animRunning=true;
+                    gsap.to(window,{
+                        scrollTo: "#threatInfo",
+                        duration: 1.5,
+                        ease: "power3.out",
+                        onComplete:()=>{
+                            animRunning=false;
+                        }
+                    });
+                }
+            }
+        });
+
+        ScrollTrigger.create({
+            trigger: "#animalOverview",
+            start: "bottom top",
+            
+            onLeaveBack:()=>{
+                if(!animRunning){
+                    animRunning=true;
+                    gsap.to(window,{
+                        scrollTo: "#animalOverview",
+                        duration: 1.5,
+                        ease: "power3.out",
+                        onComplete:()=>{
+                            animRunning=false;
+                        }
+                    });
+                }
+            }
+        });
     });
 
     function parseThreats(assessedThreats:any[], commonName:string):void{
+        console.log(assessedThreats);
         assessedThreats.forEach(i=>{
-            if(i.severity!=undefined && i.score!=undefined){
-                if(!i.severity.toLowerCase().includes("unknown") && !i.description.en.toLowerCase().includes("unknown") && !i.score.toLowerCase().includes("unknown")){
+                if(!i.description.en.toLowerCase().includes("unknown") && i.timing.toLowerCase()=="ongoing"){
                     threatsDict[i.description.en] = {
                         threatName: i.description.en,
                         score: i.score,
@@ -104,16 +147,7 @@
                     }
                     threatsArr.push(threatsDict[i.description.en]);
                 }
-            }else{
-                if(!i.description.en.toLowerCase().includes("unknown")){
-                    threatsDict[i.description.en] = {
-                        threatName: i.description.en,
-                        score: i.score,
-                        severity: i.severity
-                    }
-                    threatsArr.push(threatsDict[i.description.en]);
-                }
-            }
+            
         });
         animalDict[commonName].threats = threatsArr;
         const store = writable(animalDict);
@@ -140,12 +174,6 @@
             const response = (await axios.get(`https://api.inaturalist.org/v1/taxa?q=${scientificName.split(" ").join("%20")}`)).data;
             if(response.results.length<5){
                 for(let i:number = 0; i < response.results.length; i++){
-                    let display = "";
-                    if(i==0){
-                        display = "block";
-                    }else{
-                        display = "hidden";
-                    }
                     imgsArr.push({
                         imgSrc: response.results[i].default_photo.medium_url,
                         imgAlt: scientificName,
@@ -154,10 +182,6 @@
                 }
             }else{
                 for(let i:number = 0; i < 5; i++){
-                    let display = "hidden";
-                    if(i==0){
-                        display = "block";
-                    }
                     imgsArr.push({
                         imgSrc: response.results[i].default_photo.medium_url,
                         imgAlt: scientificName,
@@ -167,9 +191,8 @@
             }
             if(response.results.length>1){
                 imgsArr.push(imgsArr[0]);
+                interval=setInterval(next, 5000);
             }
-
-            interval=setInterval(next, 6000);
         }catch(e){
             console.log(e);
         }
@@ -201,28 +224,31 @@
     }
 </script>
 
-<div class="bg-[#E1FFC4] box-border p-[20px]">
-    <button onclick={rdrctHome} class="koho text-[24px] bg-[#FFDBE6] w-[160px] h-[40px] rounded-[18px] hover:bg-[#FFC8D7]">Home</button>
-    <h1 class="koulen text-center text-[45px] leading-[30px]">{data.commonName}</h1>
-    <h3 class="kaisei-tokumin text-[24px] text-center">({scientificName})</h3>
-    <br>
-    <div class="flex justify-around">
-        <div class="overflow-hidden w-[45vw]">
-            <div class="flex transition-transform duration-500" class:transition-transform={!lastIndex} class:duration-500={!lastIndex} class:ease-out={!lastIndex} style="transform: translateX(-{index*100}%" ontransitionend={transition}>
-                {#each imgsArr as animalImg}
-                    <AnimalImage {...animalImg}/>
-                {/each}
+<div class="bg-[#E1FFC4] box-border p-[20px]" id="screen">
+    <div class="h-[100vh]" id="animalOverview">
+        <button onclick={rdrctHome} class="koho text-[24px] bg-[#FFDBE6] w-[160px] h-[40px] rounded-[18px] hover:bg-[#FFC8D7]">Home</button>
+        <h1 class="koulen text-center text-[45px] leading-[30px]">{data.commonName}</h1>
+        <h3 class="kaisei-tokumin text-[24px] text-center">({scientificName})</h3>
+        <br>
+        <div class="flex justify-around">
+            <div class="overflow-hidden w-[45vw]">
+                <div class="flex transition-transform duration-500" class:transition-transform={!lastIndex} class:duration-500={!lastIndex} class:ease-out={!lastIndex} style="transform: translateX(-{index*100}%" ontransitionend={transition}>
+                    {#each imgsArr as animalImg}
+                        <AnimalImage {...animalImg}/>
+                    {/each}
+                </div>
             </div>
-        </div>
-        <div class="w-[48vw] h-[65vh] overflow-auto scrollbar">
-            <p class="koho text-[18px]">{animalAbout}</p>
-            <a href={`https://en.wikipedia.org/wiki/${data.commonName.split(" ").join("_")}`} title={`Wikipedia article on ${data.commonName}`} target="_blank" class="underline text-[#ff14a9]">Read more on Wikipedia</a>
+            <div class="w-[48vw] h-[65vh] overflow-auto scrollbar">
+                <p class="koho text-[18px]">{animalAbout}</p>
+                <a href={`https://en.wikipedia.org/wiki/${data.commonName.split(" ").join("_")}`} title={`Wikipedia article on ${data.commonName}`} target="_blank" class="underline text-[#ff14a9]">Read more on Wikipedia</a>
+            </div>
         </div>
     </div>
 
     <br>
+    <br>
 
-    <div class="h-[95vh]">
+    <div class="h-[95vh]" id="threatInfo">
         <h3 class="text-center text-[40px] kaisei-tokumin">Current Status: {endangeredStatus}</h3>
         <br>
         <div class="flex justify-around">
