@@ -13,8 +13,21 @@
         }
     });
 </script>
-<div class="w-[20vw] bg-red-100" bind:this={entryDiv}>
-    <h1>{animalName}</h1>
-    <img src={animalImage} alt={`Photo of ${animalName}`} class="w-[15vw]">
-    <h3>{dateOfEntry}</h3>
+
+<div bind:this={entryDiv}>
+    <img src={animalImage} alt={`Photo of ${animalName}`} class="w-[100%] h-[42vh] object-cover rounded-t-[20px]">
+    <div class="bg-[#FFFAED] h-[10vh] rounded-b-[20px]">
+        <h1 class="text-center kaisei-tokumin text-[24px]">{animalName}</h1>
+        <h3 class="text-center koho text-[15px]">{dateOfEntry}</h3>
+    </div>
 </div>
+
+<style>
+    .kaisei-tokumin{
+        font-family: "kaisei-tokumin", serif;
+    }
+
+    .koho{
+        font-family: "koho", sans-serif;
+    }
+</style>

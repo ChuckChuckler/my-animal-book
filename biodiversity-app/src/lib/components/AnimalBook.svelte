@@ -4,7 +4,7 @@
     import axios from "axios";
     import JournalEntryElement from "$lib/components/JournalEntry.svelte";
 
-    let { bookOwner, width, clickable, ownerIsUser } = $props();
+    let { bookOwner, clickable, ownerIsUser } = $props();
 
     type JournalEntry = {
         commonName:string,
@@ -29,9 +29,15 @@
     });
 </script>
 
-<h1>{bookOwner}'s Animal Book</h1>
-<div class={`w-[${width}%] grid grid-cols-3 bg-red-200`}>
+<div class="w-[90%] grid grid-cols-3 gap-5 bg-[#C1ED96] rounded-[20px] m-auto h-[72vh] overflow-auto scrollbar border-box p-[15px]">
     {#each journalEntries as entry}
         <JournalEntryElement animalName={entry.commonName} animalImage={entry.animalImage} dateOfEntry={entry.dateOf} clickable={clickable}></JournalEntryElement>
     {/each}
 </div>
+
+<style>
+    .scrollbar{
+        scrollbar-width: thin;
+        scrollbar-color: #FFDBE6 white;
+    }
+</style>
