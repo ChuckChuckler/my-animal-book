@@ -1,8 +1,8 @@
 <script lang="ts">
-    let { imgSrc, imgAlt, attribution, display, id } = $props();
+    let { imgSrc, imgAlt, attribution } = $props();
 </script>
 
-<div class={display} id={id}>
+<div class="w-[45vw] flex-shrink-0">
     <img src={imgSrc} alt={imgAlt} class="w-[45vw] h-[65vh] rounded-[25px] object-cover">
-    <p class="w-[45vw]">{attribution}</p>
+    <p>{attribution}</p>
 </div>

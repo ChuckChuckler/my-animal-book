@@ -1,10 +1,11 @@
 <script lang="ts">
     import { json } from "@sveltejs/kit";
     import type { PageProps } from "./$types";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import axios from "axios";
     import { goto } from "$app/navigation";
     import { writable } from "svelte/store";
+    import gsap from "gsap";
 
     import AnimalImage from "$lib/components/AnimalImage.svelte";
 
@@ -39,15 +40,30 @@
     type Img = {
         imgSrc: string,
         imgAlt: string,
-        attribution: string,
-        display: string
+        attribution: string
     }
     let imgsArr:Img[] = $state([]);
 
-    async function sleep(ms:number):Promise<void> {
-        return new Promise(
-            (resolve)=>setTimeout(resolve, ms)
-        );
+    
+    let index:number=$state(0);
+    let lastIndex=$state(false);
+    let interval:ReturnType<typeof setInterval>;
+
+    function next(){
+        index=(index+1)%imgsArr.length;
+    }
+
+    function transition(){
+        if(index>=imgsArr.length-1){
+            lastIndex=true;
+            index=0;
+
+            requestAnimationFrame(()=>{
+                requestAnimationFrame(()=>{
+                    lastIndex=false;
+                });
+            });
+        }
     }
 
     onMount(async ()=>{
@@ -115,7 +131,7 @@
         wikiArr.splice(0,1);
         let wikiRecord:Record<string, string> = {};
         wikiArr.forEach(i=>{
-            wikiRecord[i.split("==")[0].trim()]=i.split("==")[1].replaceAll("\n","");
+            wikiRecord[i.split("==")[0].trim()]=i.split("==")[1];
         });
     }
     
@@ -133,8 +149,7 @@
                     imgsArr.push({
                         imgSrc: response.results[i].default_photo.medium_url,
                         imgAlt: scientificName,
-                        attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by"),
-                        display: display
+                        attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by")
                     })
                 }
             }else{
@@ -146,42 +161,23 @@
                     imgsArr.push({
                         imgSrc: response.results[i].default_photo.medium_url,
                         imgAlt: scientificName,
-                        attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by"),
-                        display: display
+                        attribution: response.results[i].default_photo.attribution.replaceAll("uploaded by", "uploaded to INaturalist by")
                     })
                 }
             }
-            cycleImages(response.results.length);
+            if(response.results.length>1){
+                imgsArr.push(imgsArr[0]);
+            }
+
+            interval=setInterval(next, 6000);
         }catch(e){
             console.log(e);
         }
     }
 
-    let index:number=0;
-
-    async function cycleImages(numImages:number){
-        while(true){
-            await sleep(3000);
-
-            /*console.log(document.getElementById(`animalImage${index}`));
-
-            let obj:any = document.getElementById(`animalImage${index}`);
-            if(obj!=null){
-                obj.display = "none";
-            }
-
-            if(index==numImages){
-                index=0;
-            }else{
-                index+=1;
-            }
-
-            obj = document.getElementById(`animalImage${index}`);
-            if(obj!=null){
-                obj.display = "block";
-            }*/
-        }
-    }
+    onDestroy(()=>{
+        clearInterval(interval);
+    })
 
     async function getConservation(commonName:string){
         if(animalDict[commonName].conservation.length==0){
@@ -211,10 +207,12 @@
     <h3 class="kaisei-tokumin text-[24px] text-center">({scientificName})</h3>
     <br>
     <div class="flex justify-around">
-        <div>
-            {#each imgsArr as animalImg}
-                <AnimalImage imgSrc={animalImg.imgSrc} imgAlt={animalImg.imgAlt} attribution={animalImg.attribution} display={animalImg.display} id={`animalImage${imgsArr.indexOf(animalImg)}`}></AnimalImage>
-            {/each}
+        <div class="overflow-hidden w-[45vw]">
+            <div class="flex transition-transform duration-500" class:transition-transform={!lastIndex} class:duration-500={!lastIndex} class:ease-out={!lastIndex} style="transform: translateX(-{index*100}%" ontransitionend={transition}>
+                {#each imgsArr as animalImg}
+                    <AnimalImage {...animalImg}/>
+                {/each}
+            </div>
         </div>
         <div class="w-[48vw] h-[65vh] overflow-auto scrollbar">
             <p class="koho text-[18px]">{animalAbout}</p>
@@ -223,20 +221,30 @@
     </div>
 
     <br>
-    <h3>{endangeredStatus}</h3>
-    <h2>Threats</h2>
-    <ul>
-        {#each threatsArr as threatElement}
-            <li>{`${threatElement.threatName}`}</li>
-        {/each}
-    </ul>
-    <br>
-    <h2>Conservation Actions</h2>
-    <ul>
-        {#each conservationArr as conservationAction}
-            <li>{`${conservationAction}`}</li>
-        {/each}
-    </ul>
+
+    <div class="h-[95vh]">
+        <h3 class="text-center text-[40px] kaisei-tokumin">Current Status: {endangeredStatus}</h3>
+        <br>
+        <div class="flex justify-around">
+            <div class="bg-[#FFFAED] yellowDiv overflow-auto rounded-[25px] box-border p-[15px]">
+                <h2 class="koulen text-[40px] text-center">Threats</h2>
+                <ul>
+                    {#each threatsArr as threatElement}
+                        <li class="koho text-[22px]">{`${threatElement.threatName}`}</li>
+                    {/each}
+                </ul>
+            </div>
+
+             <div class="bg-[#FFFAED] yellowDiv overflow-auto rounded-[25px] p-[15px]">
+                <h2 class="koulen text-[40px] text-center">Conservation Actions</h2>
+                <ul>
+                    {#each conservationArr as conservationAction}
+                        <li>{`${conservationAction}`}</li>
+                    {/each}
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -255,5 +263,27 @@
     .scrollbar{
         scrollbar-width: thin;
         scrollbar-color: #FFDBE6 white;
+    }
+
+    @keyframes yellowDiv-1{
+        from{width:45vw;height:80vh}
+        to{width:48vw;height:80vh}
+    }
+
+    @keyframes yellowDiv-2{
+        to{width:45vw;height:80vh}
+        from{width:48vw;height:80vh}
+    }
+
+    .yellowDiv{
+        width: 45vw;
+        height: 80vh;
+        animation: yellowDiv-2 0.5s ease-out;
+    }
+
+    .yellowDiv:hover{
+        width: 48vw;
+        height: 80vh;
+        animation: yellowDiv-1 0.5s ease-out;
     }
 </style>
