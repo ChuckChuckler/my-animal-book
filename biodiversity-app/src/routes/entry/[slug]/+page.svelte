@@ -123,7 +123,7 @@
                 <h2 class="koho text-center text-[32px]">{scientificName}</h2>
                 <br>
                 <h3 class="koho text-[22px]">Found: {foundWhere}</h3>
-                <p class="koho text-[22px]">Notes:<br>{entryInfo}</p>
+                <p class="koho text-[22px] h-[40vh] overflow-auto">Notes:<br>{entryInfo}</p>
             </div>
         </div>
         <br>
