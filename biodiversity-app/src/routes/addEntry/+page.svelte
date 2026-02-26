@@ -4,6 +4,7 @@
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
     import axios from "axios";
     import gsap from "gsap";
+    import { ScrollTrigger,  ScrollToPlugin} from "gsap/all";
 
     let errMsg:any = $state("");
     let errMsg2:any=$state("");
@@ -11,6 +12,8 @@
 
     let uploadedImgDiv:string=$state("hidden");
     let journalEntryFields:string = $state("hidden");
+
+    let journalAndInfoDiv:any;
 
     let commonNameUnedited:string = $state("");
 
@@ -34,9 +37,48 @@
         "NA":"Unknown/Least Concern"
     };
 
-    onMount(()=>{
+    let animRunning = false;
 
-    })
+    onMount(()=>{
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        ScrollTrigger.create({
+            trigger:"#journalAndInfo",
+            start: "top bottom",
+            end: "bottom bottom",
+            onEnter:()=>{
+                if(!animRunning){
+                    animRunning=true;
+                    gsap.to(window,{
+                        scrollTo: "#journalAndInfo",
+                        duration: 1.5,
+                        ease:"power3.out",
+                        onComplete:()=>{
+                            animRunning=false;
+                        }
+                    });
+                }
+            }
+        });
+
+        ScrollTrigger.create({
+            trigger:"#entryAddingDiv",
+            start: "bottom top",
+            onLeaveBack:()=>{
+                if(!animRunning){
+                    animRunning=true;
+                    gsap.to(window,{
+                        scrollTo: "#entryAddingDiv",
+                        duration: 1.5,
+                        ease: "power3.out",
+                        onComplete:()=>{
+                            animRunning=false;
+                        }
+                    });
+                }
+            }
+        })
+    });
 
     let imgInput:any;
     function detect(){
@@ -94,6 +136,17 @@
                         learnAboutDiv=`visible`;
                         await getInfo();
                         errMsg="";
+                        if(typeof window !== "undefined"){
+                            animRunning=true;
+                            gsap.to(window,{
+                                scrollTo: "#journalAndInfo",
+                                duration: 1.5,
+                                ease:"power3.out",
+                                onComplete:()=>{
+                                    animRunning=false;
+                                }
+                            });
+                        }
                     }
                 }
             }catch(e){
@@ -186,7 +239,7 @@
     <button onclick={rdrctJournal} class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7]">Return to journal</button>
     <br>
     
-    <div class="h-[110vh]">
+    <div class="h-[100vh]" id="entryAddingDiv">
         <h1 class="koulen text-center text-[60px]">Add Entry</h1>
         <hr class="border-[1px] border-black w-[25%] m-auto">
         <br>
@@ -202,7 +255,7 @@
         <br>
     </div>
 
-    <div class="flex w-[95%] justify-around h-[90vh] {journalEntryFields} m-auto">
+    <div class="flex w-[95%] justify-around h-[90vh] {journalEntryFields} m-auto" id="journalAndInfo" bind:this={journalAndInfoDiv}>
         <div class="w-[49%]">
             <div>
                 <label for="commonName" class="koho text-[20px]">Common Name</label>
