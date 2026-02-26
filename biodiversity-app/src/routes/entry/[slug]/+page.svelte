@@ -140,16 +140,16 @@
             <img src={animalImage} alt={`Image of ${data.animalName}`} class="img rounded-[20px] object-cover">
             <div class="w-[48%]">
                 <label class="koho text-[20px]" for="animalCommonName">Entry Title/Animal Name (if applicable)</label>
-                <input id="animalCommonName" autocomplete="off" class="pl-[15px] block m-auto text-[22px] bg-[#FFF8E6] rounded-[20px] h-[50px] w-[90%]" type="text" bind:value="{commonNameEdited}">
+                <input id="animalCommonName" autocomplete="off" class="pl-[15px] block m-auto text-[22px] bg-[#FFF8E6] rounded-[20px] edit-inputs" type="text" bind:value="{commonNameEdited}">
                 <br>
                 <label class="koho text-[20px]" for="animalScientificName">Subtitle/Scientific Name (if applicable)</label>
-                <input autocomplete="off" class="pl-[15px] block m-auto text-[22px] bg-[#FFF8E6] rounded-[20px] h-[50px] w-[90%]" bind:value={scientificNameEdited}>
+                <input autocomplete="off" class="pl-[15px] block m-auto text-[22px] bg-[#FFF8E6] rounded-[20px] edit-inputs" bind:value={scientificNameEdited}>
                 <br>
                 <label class="koho text-[20px]" for="animalFoundWhere">Found:</label>
-                <input autocomplete="off" type="text" class="text-[22px] pl-[15px] block m-auto bg-[#FFF8E6] rounded-[20px] h-[50px] w-[90%]" id="animalFoundWhere" bind:value={foundWhereEdited}>
+                <input autocomplete="off" type="text" class="text-[22px] pl-[15px] block m-auto bg-[#FFF8E6] rounded-[20px] edit-inputs" id="animalFoundWhere" bind:value={foundWhereEdited}>
                 <br>
                 <label class="koho text-[20px]" for="animalEntryDesc">Notes:</label>
-                <textarea id="animalEntryDesc" bind:value={entryInfoEdited} class="text-[22px] pl-[15px] block m-auto bg-[#FFF8E6] rounded-[20px] h-[50px] w-[90%]">{entryInfo}</textarea>
+                <textarea id="animalEntryDesc" bind:value={entryInfoEdited} class="text-[22px] pl-[15px] block m-auto bg-[#FFF8E6] rounded-[20px] edit-inputs">{entryInfo}</textarea>
             </div>
         </div>
         <br>
@@ -160,13 +160,15 @@
         <p>{errMsg}</p>
     </div>
 
-    <div bind:this={deletionConfirmation} class="block h-[90vh]">
-        <div class="bg-[#FFF8E6] w-[60vw] h-[80vh] m-auto rounded-[20px] border-box p-[30px]">
+    <div bind:this={deletionConfirmation} class="hidden h-[90vh]">
+        <div class="bg-[#FFF8E6] del-div m-auto rounded-[20px] border-box p-[30px]">
             <h1 class="koulen text-[35px] text-center">Are you sure you want to delete this entry?</h1>
             <h2 class="koulen text-[40px] text-center text-red-500">This cannot be undone!!!</h2>
+            <br>
+            <br>
             <div class="flex justify-around h-[100px]">
-                <button class="bg-[#C1ED96] w-[48%] rounded-[20px] text-[30px] koho" onclick={deleteEntry}>Yes</button>
-                <button class="bg-[#f56262] w-[48%] rounded-[20px] text-[30px] koho" onclick={cancelDel}>No</button>
+                <button class="bg-[#C1ED96] hover:bg-[#ade675] rounded-[20px] text-[30px] koho del-btn" onclick={deleteEntry}>Yes</button>
+                <button class="bg-[#f56262] hover:bg-[#f54949] rounded-[20px] text-[30px] koho del-btn" onclick={cancelDel}>No</button>
             </div>
         </div>
     </div>
@@ -227,5 +229,70 @@
         width: 47%;
         height: 103%;
         animation: img-1 0.5s ease-out;
+    }
+
+    @keyframes edit-inputs-1{
+        from{width:90%;height:50px;}
+        to{width:92%;height:53px;}
+    }
+
+    @keyframes edit-inputs-2{
+        to{width:90%;height:50px;}
+        from{width:92%;height:53px;}
+    }
+
+    .edit-inputs{
+        width:90%;
+        height:50px;
+        animation: edit-inputs-2 0.5s ease-out;
+    }
+    
+    .edit-inputs:hover{
+        width:92%;
+        height:53px;
+        animation: edit-inputs-1 0.5s ease-out;
+    }
+
+    @keyframes del-div-1{
+        from{width:60vw;height:80vh}
+        to{width:63vw;height:83vh}
+    }
+
+    @keyframes del-div-2{
+        to{width:60vw;height:80vh}
+        from{width:63vw;height:83vh}
+    }
+
+
+    .del-div{
+        width:60vw;
+        height:80vh;
+        animation: del-div-2 0.5s ease-out;
+    }
+
+    .del-div:hover{
+        width:63vw;
+        height:83vh;
+        animation: del-div-1 0.5s ease-out;
+    }
+
+    @keyframes del-btn-1{
+        from{width:48%;}
+        to{width:51%;}
+    }
+
+    @keyframes del-btn-2{
+        to{width:48%;}
+        from{width:51%;}
+    }
+
+    .del-btn{
+        width:48%;
+        animation: del-btn-2 0.5s ease-out;
+    }
+
+    .del-btn:hover{
+        width:51%;
+        animation: del-btn-1 0.5s ease-out;
     }
 </style>
