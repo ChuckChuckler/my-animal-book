@@ -15,8 +15,8 @@
 </script>
 
 <div bind:this={entryDiv}>
-    <img src={animalImage} alt={`Photo of ${animalName}`} class="w-[100%] h-[42vh] object-cover rounded-t-[20px]">
-    <div class="bg-[#FFFAED] h-[10vh] rounded-b-[20px]">
+    <img src={animalImage} alt={`Photo of ${animalName}`} class="w-[100%] h-[70%] object-cover rounded-t-[20px]">
+    <div class="bg-[#FFFAED] rounded-b-[20px]">
         <h1 class="text-center kaisei-tokumin text-[24px]">{animalName}</h1>
         <h3 class="text-center koho text-[15px]">{dateOfEntry}</h3>
     </div>
