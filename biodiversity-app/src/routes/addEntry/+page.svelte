@@ -1,19 +1,23 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { onMount } from "svelte";
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
     import axios from "axios";
+    import gsap from "gsap";
 
     let errMsg:any = $state("");
+    let errMsg2:any=$state("");
     let uploadedImg:string = $state("");
 
-    let journalEntryFields = $state("hidden");
+    let uploadedImgDiv:string=$state("hidden");
+    let journalEntryFields:string = $state("hidden");
 
-    let commonNameUnedited = $state("");
+    let commonNameUnedited:string = $state("");
 
-    let commonName = $state("");
-    let scientificName = $state("");
-    let foundWhere = $state("");
-    let notes = $state("");
+    let commonName:string = $state("");
+    let scientificName:string = $state("");
+    let foundWhere:string = $state("");
+    let notes:string = $state("");
 
     let threats:string[] = $state([]);
     let endStatus:string = $state("");
@@ -30,11 +34,16 @@
         "NA":"Unknown/Least Concern"
     };
 
+    onMount(()=>{
+
+    })
+
     let imgInput:any;
     function detect(){
         if(imgInput.files[0]!=undefined){
             let imagePreview = URL.createObjectURL(imgInput.files[0]);
             uploadedImg = imagePreview;
+            uploadedImgDiv="block";
             learnAboutDiv="invisible";
             journalEntryFields="hidden";
         }else{
@@ -67,6 +76,7 @@
     }
 
     async function send(){
+        errMsg="Loading...";
         createB64(false)
         .then(async b64=>{
             try{
@@ -83,6 +93,7 @@
                     if(commonName!="" && scientificName!=""){
                         learnAboutDiv=`visible`;
                         await getInfo();
+                        errMsg="";
                     }
                 }
             }catch(e){
@@ -171,58 +182,163 @@
     
 </script>
 
-<button onclick={rdrctJournal}>Return to journal</button>
-<br>
+<div class="bg-[#E1FFC4] border-box p-[20px]">
+    <button onclick={rdrctJournal} class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7]">Return to journal</button>
+    <br>
+    
+    <div class="h-[110vh]">
+        <h1 class="koulen text-center text-[60px]">Add Entry</h1>
+        <hr class="border-[1px] border-black w-[25%] m-auto">
+        <br>
+        <input type="file" accept="image/*" bind:this={imgInput} onchange={detect} class="bg-[#FFFAED] rounded-full block m-auto pr-[15px] koho text-[20px] file-input relative">
+        <br>
+        <div class="text-center {uploadedImgDiv}">
+            <img src={uploadedImg} alt="your uploaded img" class="m-auto object-cover rounded-[15px] img-hover">
+            <br>
+            <button onclick={send} class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7]">Submit Image</button>
+            <br>
+            <p class="text-red-500">{errMsg}</p>
+        </div>
+        <br>
+    </div>
 
-<div class="flex w-[95%] justify-around">
-    <div class="w-[49%] bg-red-100">
-        <h1>Add Entry</h1>
-        <input type="file" accept="image/*" bind:this={imgInput} onchange={detect}>
-        <br>
-        <button onclick={send}>detect</button>
-        <br>
-        <img src={uploadedImg} alt="your uploaded img" class="w-[30vw]">
-        <br>
-        <br>
-        <div class={journalEntryFields}>
-            <label for="commonName">Common Name</label>
+    <div class="flex w-[95%] justify-around h-[90vh] {journalEntryFields} m-auto">
+        <div class="w-[49%]">
+            <div>
+                <label for="commonName" class="koho text-[20px]">Common Name</label>
+                <br>
+                <input type="text" class="w-[90%] rounded-full bg-[#FFFAED] pl-[15px] h-[40px]" name="commonName" id="commonName" autocomplete="off" bind:value={commonName}>
+                <br>
+                <br>
+                <label for="scientificName" class="koho text-[20px]">Scientific Name</label>
+                <br>
+                <input type="text" class="w-[90%] rounded-full bg-[#FFFAED] pl-[15px] h-[40px]" name="scientificName" id="scientificName" autocomplete="off" bind:value={scientificName}>
+                <br>
+                <br>
+                <label for="foundWhere" class="koho text-[20px]">Where was it found?</label>
+                <br>
+                <input type="text" class="w-[90%] rounded-full bg-[#FFFAED] pl-[15px] h-[40px]" name="foundWhere" id="foundWhere" autocomplete="off" bind:value={foundWhere}>
+                <br>
+                <br>
+                <label for="notes" class="koho text-[20px]">Notes</label>
+                <br>
+                <textarea id="notes" class="w-[90%] rounded-[20px] bg-[#FFFAED] pl-[15px] h-[130px]" bind:value={notes}></textarea>
+                <br>
+                <br>
+                <button onclick={addEntry} class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7] block m-auto">Add to Journal</button>
+                <br>
+            </div>
+        </div>
+        
+        <div class="{learnAboutDiv} w-[49%] bg-[#C1ED96] rounded-[15px] overflow-auto scrollbar border-box p-[20px]">
+            <h1 class="kaisei-tokumin text-[30px]">Looks like this is a(n) {commonNameUnedited}!</h1>
+            <h3 class="koho text-[25px]">Status: {endStatus}</h3>
             <br>
-            <input type="text" name="commonName" id="commonName" autocomplete="off" bind:value={commonName}>
+            <div>
+                <h3 class="koho text-[25px]">Info:</h3>
+                <p class="koho text-[18px]">{animalWikiInfo}</p>
+                <a class="koho text-[18px] underline text-[#ff14a9]" href={`https://en.wikipedia.org/wiki/${commonNameUnedited.split(" ").join("_")}`} target="_blank">Read more on Wikipedia</a>
+            </div>
             <br>
             <br>
-            <label for="scientificName">Scientific Name</label>
-            <br>
-            <input type="text" name="scientificName" id="scientificName" autocomplete="off" bind:value={scientificName}>
-            <br>
-            <br>
-            <label for="foundWhere">Where was it found?</label>
-            <br>
-            <input type="text" name="foundWhere" id="foundWhere" autocomplete="off" bind:value={foundWhere}>
-            <br>
-            <br>
-            <label for="notes">Notes</label>
-            <br>
-            <textarea id="notes" bind:value={notes}></textarea>
-            <br>
-            <button onclick={addEntry}>Add to Journal</button>
-            <p>{errMsg}</p>
+            <h3 class="koho text-[25px]">Threats?</h3>
+            <ul>
+                {#each threats as threat}
+                    <li class="koho text-[18px]">{threat}</li>
+                {/each}
+            </ul>
         </div>
     </div>
-    
-    <div class={`${learnAboutDiv} w-[49%] bg-red-100`}>
-        <h1>Looks like this is a(n) {commonNameUnedited}!</h1>
-        <h3>Status: {endStatus}</h3>
-        <br>
-        <h3>Info:</h3>
-        <p>{animalWikiInfo}</p>
-        <a href={`https://en.wikipedia.org/wiki/${commonNameUnedited.split(" ").join("_")}`} target="_blank">Read more on Wikipedia</a>
-        <br>
-        <br>
-        <h3>Threats?</h3>
-        <ul>
-            {#each threats as threat}
-                <li>{threat}</li>
-            {/each}
-        </ul>
-    </div>
 </div>
+
+<style>
+    .koulen{
+        font-family: "Koulen", sans-serif;
+    }
+
+    .koho{
+        font-family: "koho", sans-serif;
+    }
+
+    .kaisei-tokumin{
+        font-family: "kaisei-tokumin", serif;
+    }
+
+    @keyframes pink-btn-1{
+        from{width: 160px; height: 50px}
+        to{width: 165px; height: 55px}
+    }
+
+    @keyframes pink-btn-2{
+        to{width: 160px; height: 50px}
+        from{width: 165px; height: 55px}
+    }
+
+    .pink-btn{
+        width: 160px;
+        height: 50px;
+        animation: pink-btn-2 0.5s ease-out;
+    }
+
+    .pink-btn:hover{
+        width: 165px;
+        height: 55px;
+        animation: pink-btn-1 0.5s ease-out;
+    }
+
+    @keyframes file-input-1{
+        from{height:40px;width:30%}
+        to{height:42px;width:32%}
+    }
+
+    @keyframes file-input-2{
+        to{height:40px;width:30%}
+        from{height:42px;width:32%}
+    }
+
+    .file-input{
+        height:40px;
+        width:30%;
+        animation: file-input-2 0.5s ease-out;
+    }
+
+    .file-input:hover{
+        height:42px;
+        width:32%;
+        animation: file-input-1 0.5s ease-out;
+    }
+
+    .file-input::file-selector-button{
+        background-color: #F0E1BA;
+        width: 40%;
+        left:0;
+        height:100%;
+    }
+
+    .file-input::file-selector-button:hover{
+        background-color: #f1dba2;
+    }
+
+    @keyframes img-hover-1{
+        from{width:30vw} to{width:32vw}
+    }
+
+    @keyframes img-hover-2{
+        to{width:30vw} from{width:32vw}
+    }
+
+    .img-hover{
+        width:30vw;
+        animation: img-hover-2 0.5s ease-out;
+    }
+
+    .img-hover:hover{
+        width:32vw;
+        animation: img-hover-1 0.5s ease-out;
+    }
+
+    .scrollbar{
+        scrollbar-width: thin;
+        scrollbar-color: #FFDBE6 white;
+    }
+</style>
