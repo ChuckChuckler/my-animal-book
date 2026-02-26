@@ -25,7 +25,7 @@
         const journal = (await axios.post("/api/getJournal", {
             username:bookOwner
         })).data.msg.journal;
-        journalEntries = journal;
+        journalEntries = journal.reverse();
     });
 </script>
 
