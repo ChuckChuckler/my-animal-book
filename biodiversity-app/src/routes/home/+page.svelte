@@ -193,7 +193,7 @@
         goto("animalBook");
     }
 </script>
-<div class="bg-linear-to-b from-[#E1FFC4] to-[#CAFF82] h-[100vh] overflow-hidden">
+<div class="bg-linear-to-b from-[#E1FFC4] to-[#BEFF66] h-[100vh] overflow-hidden">
     <div class="flex w-[95vw] h-[23vh] m-auto justify-around">
         <div class="w-[40%] m-auto">
             <div class="flex justify-around w-[100%]">

@@ -157,7 +157,7 @@
             <br>
             <p class="koho text-[20px] h-[25vh]">{userBio}</p>
             <br>
-            <button class="{editVisibility} koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7] m-auto " onclick={showEditInterface}>Edit</button>
+            <button class="{editVisibility} koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7] m-auto" onclick={showEditInterface}>Edit</button>
         </div>
         <div class="h-[95vh]">
             <br>
@@ -171,20 +171,21 @@
         </div>
     </div>
 
-    <div class={`${editingInterface}`}>
-        <h1>{data.username}</h1>
+    <div class="{editingInterface}">
         <img src={newUserPfp} alt="user profile" class="w-[200px] rounded-full object-cover aspect-square">
-        <label for="editImage">Edit image: </label>
-        <input type="file" accept="image/*" bind:this={newImageInput} id="editImage" onchange={showNewImg}>
+        <label for="editImage" class="koho text-[25px]">Edit image: </label>
+        <input type="file" accept="image/*" bind:this={newImageInput} id="editImage" onchange={showNewImg} class="bg-[#FFFAED] rounded-full block pr-[15px] koho text-[20px] file-input relative">
         <br>
         <br>
-        <label for="editBio">Edit bio:</label>
+        <label for="editBio" class="koho text-[25px]">Edit bio:</label>
         <br>
-        <textarea id="editBio" bind:value={newBio}></textarea>
+        <textarea id="editBio" class="bg-[#FFFAED] w-[40%] h-[100px] p-[5px] border-box" bind:value={newBio}></textarea>
         <br>
         <br>
-        <button onclick={saveEdits}>Save</button>
-        <button onclick={cancelEdits}>Cancel</button>
+        <div class="flex justify-around w-[30%]">
+            <button class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7] m-auto" onclick={saveEdits}>Save</button>
+            <button class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7] m-auto" onclick={cancelEdits}>Cancel</button>
+        </div>
     </div>
 </div>
 
@@ -221,5 +222,38 @@
         width: 165px;
         height: 55px;
         animation: pink-btn-1 0.5s ease-out;
+    }
+
+    @keyframes file-input-1{
+        from{height:40px;width:30%}
+        to{height:42px;width:32%}
+    }
+
+    @keyframes file-input-2{
+        to{height:40px;width:30%}
+        from{height:42px;width:32%}
+    }
+
+    .file-input{
+        height:40px;
+        width:30%;
+        animation: file-input-2 0.5s ease-out;
+    }
+
+    .file-input:hover{
+        height:42px;
+        width:32%;
+        animation: file-input-1 0.5s ease-out;
+    }
+
+    .file-input::file-selector-button{
+        background-color: #F0E1BA;
+        width: 40%;
+        left:0;
+        height:100%;
+    }
+
+    .file-input::file-selector-button:hover{
+        background-color: #f1dba2;
     }
 </style>
