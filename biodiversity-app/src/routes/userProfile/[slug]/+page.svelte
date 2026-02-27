@@ -4,6 +4,8 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import AnimalBook from "$lib/components/AnimalBook.svelte";
+    import gsap from "gsap";
+    import { ScrollTrigger,  ScrollToPlugin} from "gsap/all";
 
     import editBtn from "$lib/assets/editBtn.png";
 
@@ -28,6 +30,8 @@
     let newStatus:string=$state("");
 
     onMount(async ()=>{
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
         let currentClient = document.cookie.split("=")[1];
 
         const fetchedInfo = (await axios.post("/api/getUserInfo", {username: data.username})).data;
@@ -46,6 +50,46 @@
             editVisibility="block";
             statusEditorBtn="block";
         }
+        
+        let animRunning=false;
+
+        ScrollTrigger.create({
+            trigger:"#userBookSection",
+            start: "top bottom",
+            end: "bottom top",
+            onEnter:()=>{
+                if(!animRunning){
+                    animRunning=true;
+                    gsap.to(window,{
+                        scrollTo: "#userBookSection",
+                        duration: 1.5,
+                        ease:"power3.out",
+                        onComplete:()=>{
+                            animRunning=false;
+                        }
+                    });
+                }
+            }
+        });
+
+        ScrollTrigger.create({
+            trigger:"#userInfoSection",
+            start: "bottom top",
+            onLeaveBack:()=>{
+                if(!animRunning){
+                    animRunning=true;
+                    gsap.to(window,{
+                        scrollTo: "#homeButton",
+                        duration: 1.5,
+                        ease: "power3.out",
+                        onComplete:()=>{
+                            animRunning=false;
+                        }
+                    });
+                }
+            }
+        })
+
     });
 
     function home(){
@@ -135,11 +179,11 @@
 </script>
 
 <div class="bg-[#E1FFC4] border-box p-[15px]">
-    <button onclick={home} class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7]">Home</button>
+    <button id="homeButton" onclick={home} class="koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7]">Home</button>
     <br>
     <br>
     <div class="{userDisplay}">
-        <div class="h-[85vh]">
+        <div class="h-[100vh]" id="userInfoSection">
             <div class="flex justify-start">
                 <img src={userPfp} alt="user profile" class="w-[200px] rounded-full object-cover aspect-square">
                 <div class="mt-auto mb-auto ml-[15px]">
@@ -159,7 +203,7 @@
             <br>
             <button class="{editVisibility} koho text-[20px] bg-[#FFDBE6] hover:bg-[#FFC8D7] pink-btn rounded-[18px] hover:bg-[#FFC8D7] m-auto" onclick={showEditInterface}>Edit</button>
         </div>
-        <div class="h-[95vh]">
+        <div class="h-[100vh]" id="userBookSection">
             <br>
             <br>
             <div>
