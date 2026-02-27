@@ -1,7 +1,7 @@
 <script lang="ts">
     import { json } from "@sveltejs/kit";
     import type { PageProps } from "./$types";
-    import { onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import axios from "axios";
     import { goto } from "$app/navigation";
     import { writable } from "svelte/store";
@@ -67,6 +67,8 @@
         }
     }
 
+    let ctx:any;
+
     onMount(async ()=>{
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -94,45 +96,48 @@
                 console.log(e);
             }
         }
-        //gsap
-        let animRunning = false;
+        
+        await tick();
+        ctx=gsap.context(()=>{
+            let animRunning = false;
 
-        ScrollTrigger.create({
-            trigger: "#threatInfo",
-            start: "top bottom",
-            end: "bottom top",
-            onEnter:()=>{
-                if(!animRunning){
-                    animRunning=true;
-                    gsap.to(window,{
-                        scrollTo: "#threatInfo",
-                        duration: 1.5,
-                        ease: "power3.out",
-                        onComplete:()=>{
-                            animRunning=false;
-                        }
-                    });
+            ScrollTrigger.create({
+                trigger: "#threatInfo",
+                start: "top bottom",
+                end: "bottom top",
+                onEnter:()=>{
+                    if(!animRunning){
+                        animRunning=true;
+                        gsap.to(window,{
+                            scrollTo: "#threatInfo",
+                            duration: 1.5,
+                            ease: "power3.out",
+                            onComplete:()=>{
+                                animRunning=false;
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
 
-        ScrollTrigger.create({
-            trigger: "#animalOverview",
-            start: "bottom top",
-            
-            onLeaveBack:()=>{
-                if(!animRunning){
-                    animRunning=true;
-                    gsap.to(window,{
-                        scrollTo: "#animalOverview",
-                        duration: 1.5,
-                        ease: "power3.out",
-                        onComplete:()=>{
-                            animRunning=false;
-                        }
-                    });
+            ScrollTrigger.create({
+                trigger: "#animalOverview",
+                start: "bottom top",
+                
+                onLeaveBack:()=>{
+                    if(!animRunning){
+                        animRunning=true;
+                        gsap.to(window,{
+                            scrollTo: "#animalOverview",
+                            duration: 1.5,
+                            ease: "power3.out",
+                            onComplete:()=>{
+                                animRunning=false;
+                            }
+                        });
+                    }
                 }
-            }
+            });
         });
     });
 
@@ -200,6 +205,8 @@
 
     onDestroy(()=>{
         clearInterval(interval);
+        ctx?.revert();
+        ScrollTrigger.killAll();
     })
 
     async function getConservation(commonName:string){

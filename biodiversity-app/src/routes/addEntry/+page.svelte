@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { onMount } from "svelte";
+    import { onMount, tick, onDestroy } from "svelte";
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
     import axios from "axios";
     import gsap from "gsap";
@@ -39,46 +39,56 @@
 
     let animRunning = false;
 
-    onMount(()=>{
+    let ctx:any;
+
+    onMount(async ()=>{
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-        ScrollTrigger.create({
-            trigger:"#journalAndInfo",
-            start: "top bottom",
-            end: "bottom bottom",
-            onEnter:()=>{
-                if(!animRunning){
-                    animRunning=true;
-                    gsap.to(window,{
-                        scrollTo: "#journalAndInfo",
-                        duration: 1.5,
-                        ease:"power3.out",
-                        onComplete:()=>{
-                            animRunning=false;
-                        }
-                    });
+        await tick();
+        ctx=gsap.context(()=>{
+            ScrollTrigger.create({
+                trigger:"#journalAndInfo",
+                start: "top bottom",
+                end: "bottom bottom",
+                onEnter:()=>{
+                    if(!animRunning){
+                        animRunning=true;
+                        gsap.to(window,{
+                            scrollTo: "#journalAndInfo",
+                            duration: 1.5,
+                            ease:"power3.out",
+                            onComplete:()=>{
+                                animRunning=false;
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
 
-        ScrollTrigger.create({
-            trigger:"#entryAddingDiv",
-            start: "bottom top",
-            onLeaveBack:()=>{
-                if(!animRunning){
-                    animRunning=true;
-                    gsap.to(window,{
-                        scrollTo: "#entryAddingDiv",
-                        duration: 1.5,
-                        ease: "power3.out",
-                        onComplete:()=>{
-                            animRunning=false;
-                        }
-                    });
+            ScrollTrigger.create({
+                trigger:"#entryAddingDiv",
+                start: "bottom top",
+                onLeaveBack:()=>{
+                    if(!animRunning){
+                        animRunning=true;
+                        gsap.to(window,{
+                            scrollTo: "#entryAddingDiv",
+                            duration: 1.5,
+                            ease: "power3.out",
+                            onComplete:()=>{
+                                animRunning=false;
+                            }
+                        });
+                    }
                 }
-            }
+            })
         })
     });
+
+    onDestroy(()=>{
+        ctx?.revert();
+        ScrollTrigger.killAll();
+    })
 
     let imgInput:any;
     function detect(){

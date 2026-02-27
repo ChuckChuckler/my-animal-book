@@ -1,7 +1,7 @@
 <script lang="ts">
     import axios from "axios";
     import type { PageProps } from "./$types";
-    import { onMount } from "svelte";
+    import { onMount, tick, onDestroy } from "svelte";
     import { goto } from "$app/navigation";
     import AnimalBook from "$lib/components/AnimalBook.svelte";
     import gsap from "gsap";
@@ -29,6 +29,8 @@
     let newUserPfp:string=$state("");
     let newStatus:string=$state("");
 
+    let ctx:any;
+
     onMount(async ()=>{
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -50,47 +52,54 @@
             editVisibility="block";
             statusEditorBtn="block";
         }
-        
-        let animRunning=false;
 
-        ScrollTrigger.create({
-            trigger:"#userBookSection",
-            start: "top bottom",
-            end: "bottom top",
-            onEnter:()=>{
-                if(!animRunning){
-                    animRunning=true;
-                    gsap.to(window,{
-                        scrollTo: "#userBookSection",
-                        duration: 1.5,
-                        ease:"power3.out",
-                        onComplete:()=>{
-                            animRunning=false;
-                        }
-                    });
+        await tick();
+        ctx=gsap.context(()=>{
+            let animRunning=false;
+
+            ScrollTrigger.create({
+                trigger:"#userBookSection",
+                start: "top bottom",
+                end: "bottom top",
+                onEnter:()=>{
+                    if(!animRunning){
+                        animRunning=true;
+                        gsap.to(window,{
+                            scrollTo: "#userBookSection",
+                            duration: 1.5,
+                            ease:"power3.out",
+                            onComplete:()=>{
+                                animRunning=false;
+                            }
+                        });
+                    }
                 }
-            }
+            });
+
+            ScrollTrigger.create({
+                trigger:"#userInfoSection",
+                start: "bottom top",
+                onLeaveBack:()=>{
+                    if(!animRunning){
+                        animRunning=true;
+                        gsap.to(window,{
+                            scrollTo: "#homeButton",
+                            duration: 1.5,
+                            ease: "power3.out",
+                            onComplete:()=>{
+                                animRunning=false;
+                            }
+                        });
+                    }
+                }
+            });
         });
-
-        ScrollTrigger.create({
-            trigger:"#userInfoSection",
-            start: "bottom top",
-            onLeaveBack:()=>{
-                if(!animRunning){
-                    animRunning=true;
-                    gsap.to(window,{
-                        scrollTo: "#homeButton",
-                        duration: 1.5,
-                        ease: "power3.out",
-                        onComplete:()=>{
-                            animRunning=false;
-                        }
-                    });
-                }
-            }
-        })
-
     });
+
+    onDestroy(()=>{
+        ctx?.revert();
+        ScrollTrigger.killAll();
+    })
 
     function home(){
         goto("../home");
