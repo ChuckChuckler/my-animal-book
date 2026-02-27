@@ -218,8 +218,14 @@
                 {/each}
             </div>
         </div>
-        <div class="bg-[#FFF7E4] w-[25%] h-[95%] rounded-[28px]">
-
+        <div class="bg-[#FFF7E4] w-[25%] h-[95%] rounded-[28px] p-[15px] text-center">
+            <h1 class="text-center kaisei-tokumin text-[28px]">Resources</h1>
+            <br>
+            <a href="https://www.inaturalist.org/" class="koho text-[22px]">INaturalist</a>
+            <br>
+            <a href="https://www.iucnredlist.org/" class="koho text-[22px]">IUCN Red List</a>
+            <br>
+            <a href="https://www.gbif.org/" class="koho text-[22px]">GBIF</a>
         </div>
     </div>
 </div>
