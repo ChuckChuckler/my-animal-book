@@ -2,7 +2,8 @@
     import { onMount, tick, onDestroy } from "svelte";
     import UserAuthDiv from "$lib/components/UserAuthDiv.svelte";
     import gsap from "gsap";
-    import { ScrollTrigger, ScrollToPlugin } from "gsap/all";
+    import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+    import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
     import animalBookLogo from "$lib/assets/logo.png";
     import overlayTop from "$lib/assets/overlay_top.png";
