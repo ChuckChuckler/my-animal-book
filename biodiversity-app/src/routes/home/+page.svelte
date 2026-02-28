@@ -12,6 +12,8 @@
     let username:string=$state("");
     let userPfp:string=$state("");
 
+    let endangeredLoadStatus:string=$state("");
+
     type Animal = {
         commonName: string,
         scientificName: string,
@@ -184,6 +186,7 @@
     }
 
     function createAnimals(){
+        endangeredLoadStatus="hidden";
         Object.keys(animalDict).forEach(i=>{
             animalsElements.push(animalDict[i]);
         });
@@ -213,6 +216,7 @@
             <h1 class="text-center text-[20px] kaisei-tokumin">Endangered Animals In Your Area</h1>
             <br>
             <div class="grid grid-cols-2 gap-5">
+                <h3 class={endangeredLoadStatus}>Loading...</h3>
                 {#each animalsElements as animalElement}
                     <Animal commonName={animalElement.commonName} scientificName={animalElement.scientificName} threatLevel={animalElement.status} id={animalElement.commonName.split(" ").join("%20")} imgSrc={animalElement.imgSrc}></Animal>
                 {/each}
