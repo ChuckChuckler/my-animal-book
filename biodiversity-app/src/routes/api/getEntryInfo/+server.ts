@@ -1,5 +1,5 @@
 import { COLLNAME, DB_NAME, MONGO_URI } from "$env/static/private";
-import type { RequestHandler } from "../$types";
+import type { RequestHandler } from "./$types";
 import { json } from "@sveltejs/kit";
 import MongoDB, { MongoClient, ObjectId, Collection } from "mongodb";
 
