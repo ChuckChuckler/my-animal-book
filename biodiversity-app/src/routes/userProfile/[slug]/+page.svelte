@@ -5,7 +5,8 @@
     import { goto } from "$app/navigation";
     import AnimalBook from "$lib/components/AnimalBook.svelte";
     import gsap from "gsap";
-    import { ScrollTrigger,  ScrollToPlugin} from "gsap/all";
+    import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+    import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
     import editBtn from "$lib/assets/editBtn.png";
 

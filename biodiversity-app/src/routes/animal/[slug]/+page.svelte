@@ -6,7 +6,8 @@
     import { goto } from "$app/navigation";
     import { writable } from "svelte/store";
     import gsap from "gsap";
-    import { ScrollTrigger,  ScrollToPlugin} from "gsap/all";
+    import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+    import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
     import AnimalImage from "$lib/components/AnimalImage.svelte";
 

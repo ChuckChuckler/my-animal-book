@@ -4,7 +4,8 @@
     import { PUBLIC_GEOAPIFY_KEY } from "$env/static/public";
     import axios from "axios";
     import gsap from "gsap";
-    import { ScrollTrigger,  ScrollToPlugin} from "gsap/all";
+    import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+    import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
     let errMsg:any = $state("");
     let errMsg2:any=$state("");
